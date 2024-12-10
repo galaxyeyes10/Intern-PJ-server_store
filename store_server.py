@@ -118,8 +118,8 @@ async def increase_order_quantity(user_id: str = Body(...), menu_id: int = Body(
         return {"order_id": new_order.order_id}
 
 #장바구니 -버튼 처리
-@store.put("/order/decrease/{order_id}")
-async def decrease_order_quantity(order_id: int, db: Session = Depends(get_db)):
+@store.put("/order/decrease/")
+async def decrease_order_quantity(order_id: int = Body(...), db: Session = Depends(get_db)):
     order = db.query(OrderTable).filter(OrderTable.order_id == order_id, OrderTable.is_completed == False).first()
     
     if order:
