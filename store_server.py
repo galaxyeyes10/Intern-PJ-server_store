@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Depends, Request, Body
 from sqlalchemy.orm import Session
 from model import ReviewTable, UserTable, StoreTable, MenuTable, OrderTable
 from db import session
@@ -94,8 +94,8 @@ async def read_total_count(user_id: str, db: Session = Depends(get_db)):
     return total
 
 # 장바구니 +버튼 처리, 새로운 주문의 order_id반환
-@store.put("/order/increase/{user_id}/{store_id}/{menu_id}")
-async def increase_order_quantity(user_id: str, menu_id: int, store_id: int, db: Session = Depends(get_db)):
+@store.put("/order/increase/")
+async def increase_order_quantity(user_id: str = Body(...), menu_id: int = Body(...), store_id: int = Body(...), db: Session = Depends(get_db)):
     order = db.query(OrderTable).filter(OrderTable.user_id == user_id).first()
     
     if order:
