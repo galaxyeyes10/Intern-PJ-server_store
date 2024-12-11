@@ -4,6 +4,7 @@ from model import ReviewTable, UserTable, StoreTable, MenuTable, OrderTable
 from db import session
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from pydantic import BaseModel
 import os
 import uvicorn
 
@@ -18,6 +19,9 @@ store.add_middleware(
 )
 
 store.add_middleware(SessionMiddleware, secret_key="your-secret-key")
+
+class UserInfo(BaseModel):
+    order_id: int
 
 def get_db():
     db = session()
@@ -119,8 +123,8 @@ async def increase_order_quantity(user_id: str = Body(...), menu_id: int = Body(
 
 #장바구니 -버튼 처리
 @store.put("/order/decrease/")
-async def decrease_order_quantity(order_id: int = Body(...), db: Session = Depends(get_db)):
-    order = db.query(OrderTable).filter(OrderTable.order_id == order_id, OrderTable.is_completed == False).first()
+async def decrease_order_quantity(request: UserInfo, db: Session = Depends(get_db)):
+    order = db.query(OrderTable).filter(OrderTable.order_id == request.order_id, OrderTable.is_completed == False).first()
     
     if order:
         order.quantity -= 1
